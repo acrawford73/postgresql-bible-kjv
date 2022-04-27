@@ -1,9 +1,5 @@
 The Holy Bible (King James Version) for PostgreSQL
 
-This project is 100% free to use.
-
-NOTE: Knowledge of how to setup and use PostgreSQL and Python is recommended. 
-
 The repo comes with the following files:
 
 Python script (kjv-psql.py), CSV files for each book of the Bible (created from XLSX files, exported as "CSV Comma Delimited")
