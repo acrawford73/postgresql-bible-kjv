@@ -26,18 +26,18 @@ import hashlib
 import psycopg2
 
 try:
-	print "Connecting ..."
-	conn = psycopg2.connect(host="10.0.0.122", user="postgres", password="postgres")
+	print("Connecting ...")
+	conn = psycopg2.connect(host="localhost, 127.0.0.1", user="postgres", password="postgres")
 	cur = conn.cursor()
-	print "PostgreSQL version:"
+	print("PostgreSQL version:")
 	cur.execute('SELECT version()')
 	db_version = cur.fetchone()
-	print db_version
+	print(db_version)
 	cur.close()
-	print "Connection is good!"
+	print("Connection is good!")
 except (Exception, psycopg2.DatabaseError) as error:
-	print "Failed to connect!"
-	print error
+	print("Failed to connect!")
+	print(error)
 	quit()
 finally:
 	if conn is not None:
@@ -116,10 +116,10 @@ files = [
 	'kjv-revelation.csv'
 ]
 
-conn = psycopg2.connect(host="10.0.0.122", user="postgres", password="postgres")
+conn = psycopg2.connect(host="localhost, 127.0.0.1", user="postgres", password="postgres")
 
-print
-print "Creating database: \'bible\'"
+print()
+print("Creating database: \'bible\'")
 
 sql = """CREATE DATABASE bible;"""
 conn.autocommit = True
@@ -129,20 +129,20 @@ cur.execute(sql)
 sql = """SELECT count(*) FROM pg_catalog.pg_database WHERE datname = 'bible' ;"""
 cur.execute(sql)
 if bool(cur.rowcount) == True:
-	print "Database created successfully."
-	print
+	print("Database created successfully.")
+	print()
 else:
-	print "Database creation failed."
+	print("Database creation failed.")
 	quit()
 
 cur.close()
 conn.close()
 
-conn = psycopg2.connect(host="10.0.0.122", database="bible", user="postgres", password="postgres")
+conn = psycopg2.connect(host="localhost, 127.0.0.1", database="bible", user="postgres", password="postgres")
 cur = conn.cursor()
 
-print "Creating table \'kjv\'..."
-print
+print("Creating table \'kjv\'...")
+print()
 
 sql = """CREATE TABLE kjv (
 	id INTEGER PRIMARY KEY NOT NULL,
@@ -155,30 +155,29 @@ sql = """CREATE TABLE kjv (
 cur.execute(sql)
 conn.commit()
 
-print "Importing CSV files into PostgreSQL database..."
+print("Importing CSV files into PostgreSQL database...")
 print
 
 count = 1
 for file in files:
-	print file
-	f = open('csv/'+file, 'rb')
+	print(file)
+	f = open('csv/'+file, 'r', encoding='utf-8')
 	try:
 		reader = csv.reader(f)
 		for row in reader:
-			bible_testament = row[0]
-			bible_book = row[1]
-			bible_chapter = row[2]
-			bible_verse = row[3]
-			bible_text = row[5]
-			hash_row = bible_testament + bible_book + bible_chapter + bible_verse + bible_text
-			hashed = hashlib.sha256(''.join(hash_row)).hexdigest()
-
+			bible_testament = str(row[0])
+			bible_book = str(row[1])
+			bible_chapter = str(row[2])
+			bible_verse = str(row[3])
+			bible_text = str(row[4])
+			hash_row = ''.join([bible_testament, bible_book, bible_chapter, bible_verse, bible_text])
+			hashed = hashlib.sha256(hash_row.encode('utf-8')).hexdigest()
 			sql = """INSERT INTO kjv VALUES(%s, %s, %s, %s, %s, %s, %s);"""
 			cur.execute(sql, (count, bible_testament, bible_book, bible_chapter, bible_verse, bible_text, hashed))
 			count+=1
 
 	except (Exception, psycopg2.DatabaseError) as error:
-		print "Insert failed! Erase database and start over!"
+		print("Insert failed! Erase database and start over!")
 		print(error)
 		cur.close()
 		conn.close()
@@ -188,8 +187,8 @@ conn.commit()
 cur.close()
 conn.close()
 
-print
-print "Import Completed!"
-print
+print()
+print("Import Completed!")
+print()
 
 sys.exit()
