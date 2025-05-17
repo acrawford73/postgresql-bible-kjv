@@ -13,3 +13,5 @@ To import the CSV files into your PostgreSQL instance run this command:
 python3 kjv-psql.py
 
 After import there should be 31102 verses stored. One Bible verse equals one record. 
+
+Please do not assume that all verses are 100% accurate as typos may occur. Always consult with a printed KJV Bible.
